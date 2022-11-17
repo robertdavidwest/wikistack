@@ -1,5 +1,7 @@
 const express = require('express')
 const morgan = require('morgan')
+const wikiRouter = require(`./routes/wiki`)
+const userRouter = require(`./routes/users`)
 const { db, Page, User } = require('./models')
 const app = express();
 const layout = require('./views/layout')
@@ -7,6 +9,8 @@ const layout = require('./views/layout')
 app.use(morgan('dev'))
 app.use(express.urlencoded({extended: false}))
 app.use(express.static(__dirname + '/public'))
+app.use('/wiki', wikiRouter)
+// app.use('/users', usersRouter)
 
 app.get('/', (req, res, next) => {
     res.send(layout(''));
