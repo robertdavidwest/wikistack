@@ -12,12 +12,19 @@ wikiRouter.get("/", async (req, res, next) => {
 });
 
 wikiRouter.post("/", async (req, res, next) => {
-  console.log(req.body);
   const title = req.body.title;
   const content = req.body.content;
+  const author = req.body.author;
+  const email = req.body.email;
 
   try {
     const page = await Page.create({ title, content });
+    const [user, wasCreated] = await User.findOrCreate({where: { 
+      name: author,
+      email: email
+    }});
+    
+    await page.setAuthor(user)
     res.redirect(`/wiki/${page.slug}`);
   } catch (error) {
     next(error);
