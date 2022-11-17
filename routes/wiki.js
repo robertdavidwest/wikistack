@@ -8,11 +8,12 @@ wikiRouter.get("/", (req, res, next) => {
   res.send("got to GET /wiki/");
 });
 
+
 wikiRouter.post("/", async (req, res, next) => {
   console.log(req.body);
   const title = req.body.title;
   const content = req.body.content;
-
+  
   try {
     const page = await Page.create({ title, content });
   } catch (error) {
@@ -25,4 +26,9 @@ wikiRouter.get("/add", (req, res) => {
   res.send(addPage());
 });
 
+wikiRouter.get("/:slug", async (req, res, next) => {
+  const page = await Page.findOne({where: {slug: req.params.slug}})
+  // wikiPage(page, 'yourName');
+  console.log(page)
+});
 module.exports = wikiRouter;
