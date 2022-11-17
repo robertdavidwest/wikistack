@@ -1,11 +1,14 @@
 const { Page, User } = require("../models");
 let express = require("express");
 let wikiRouter = express.Router();
-let { addPage } = require("../views");
-let { wikiPage } = require("../views");
+let { addPage, wikiPage, main } = require("../views");
 
-wikiRouter.get("/", (req, res, next) => {
-  res.send("got to GET /wiki/");
+wikiRouter.get("/", async (req, res, next) => {
+  const pages = await Page.findAll();
+  console.log("!!!");
+  console.log(Array.from(pages));
+  console.log("!!!");
+  res.send(main(pages));
 });
 
 wikiRouter.post("/", async (req, res, next) => {
@@ -15,10 +18,10 @@ wikiRouter.post("/", async (req, res, next) => {
 
   try {
     const page = await Page.create({ title, content });
+    res.redirect(`/wiki/${page.slug}`);
   } catch (error) {
     next(error);
   }
-  res.redirect("/");
 });
 
 wikiRouter.get("/add", (req, res) => {
@@ -27,9 +30,6 @@ wikiRouter.get("/add", (req, res) => {
 
 wikiRouter.get("/:slug", async (req, res, next) => {
   const page = await Page.findOne({ where: { slug: req.params.slug } });
-  // res.json(page);
-  // wikiPage(page, 'yourName');
-  console.log(page);
-  wikiPage(page, "Dave");
+  res.send(wikiPage(page, "Dave"));
 });
 module.exports = wikiRouter;
