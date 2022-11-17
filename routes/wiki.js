@@ -1,4 +1,4 @@
-const { Page } = require("../models");
+const { Page, User } = require("../models");
 let express = require("express");
 let wikiRouter = express.Router();
 let { addPage } = require("../views");
@@ -8,19 +8,13 @@ wikiRouter.get("/", (req, res, next) => {
   res.send("got to GET /wiki/");
 });
 
-function generateSlug(title) {
-  // Removes all non-alphanumeric characters from title
-  // And make whitespace underscore
-  return title.replace(/\s+/g, "_").replace(/\W/g, "");
-}
-
 wikiRouter.post("/", async (req, res, next) => {
   console.log(req.body);
   const title = req.body.title;
-  const slug = generateSlug(title);
   const content = req.body.content;
+
   try {
-    const page = await Page.create({ title, slug, content });
+    const page = await Page.create({ title, content });
   } catch (error) {
     next(error);
   }

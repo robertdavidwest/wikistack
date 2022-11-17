@@ -8,6 +8,17 @@ const Page = db.define("pages", {
   status: { type: Sequelize.ENUM("open", "closed") },
 });
 
+Page.beforeValidate(async (page) => {
+  console.log(page);
+  page.slug = await generateSlug(page.title);
+});
+
+function generateSlug(title) {
+  // Removes all non-alphanumeric characters from title
+  // And make whitespace underscore
+  return title.replace(/\s+/g, "_").replace(/\W/g, "");
+}
+
 const User = db.define("users", {
   name: { type: Sequelize.STRING, allowNull: false, unique: true },
   email: {
