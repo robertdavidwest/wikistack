@@ -10,7 +10,7 @@ app.use(morgan("dev"));
 app.use(express.urlencoded({ extended: false }));
 app.use(express.static(__dirname + "/public"));
 app.use("/wiki", wikiRouter);
-// app.use('/users', usersRouter)
+app.use("/users", userRouter);
 
 app.get("/", (req, res, next) => {
   res.redirect("/wiki");
@@ -19,7 +19,7 @@ app.get("/", (req, res, next) => {
 const port = 1337;
 
 const init = async () => {
-  await db.sync({ force: true });
+  await db.sync({ force: false });
 
   app.listen(port, () => {
     console.log("App listening");
