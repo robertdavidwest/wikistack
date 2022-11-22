@@ -5,10 +5,12 @@ const userRouter = require(`./routes/users`);
 const { db, Page, User } = require("./models");
 const app = express();
 const layout = require("./views/layout");
+var methodOverride = require("method-override");
 
 app.use(morgan("dev"));
 app.use(express.urlencoded({ extended: false }));
 app.use(express.static(__dirname + "/public"));
+app.use(methodOverride("_method"));
 app.use("/wiki", wikiRouter);
 app.use("/users", userRouter);
 

@@ -14,7 +14,7 @@ module.exports = () =>
       </div>
 
       <div class="form-group">
-        <label for="email" class="col-sm-2 control-label">Email<label>
+        <label for="email" class="col-sm-2 control-label">Email</label>
         <div class="col-sm-10">
           <input id="email" name="email" type="text" class="form-control" />
         </div>
@@ -30,11 +30,24 @@ module.exports = () =>
       <div class="form-group">
         <label for="content" class="col-sm-2 control-label">Content</label>
         <div class="col-sm-10">
-          <textarea name="content" type="text" class="form-control"></textarea>
+          <textarea
+            rows="20"
+            name="content"
+            type="text"
+            class="form-control"
+          ></textarea>
         </div>
       </div>
 
-      <div>PLACEHOLDER FOR PAGE STATUS INPUT FIELD</div>
+      <div class="form-group">
+        <label for="status" class="col-sm-2 control-label">Status</label>
+        <div class="col-sm-10">
+          <select name="status">
+            <option>open</option>
+            <option>closed</option>
+          </select>
+        </div>
+      </div>
 
       <div class="col-sm-offset-2 col-sm-10">
         <button type="submit" class="btn btn-primary">submit</button>

@@ -1,7 +1,7 @@
 const { Page, User } = require("../models");
 let express = require("express");
 let wikiRouter = express.Router();
-let { addPage, wikiPage, main } = require("../views");
+let { addPage, editPage, wikiPage, main } = require("../views");
 
 wikiRouter.get("/", async (req, res, next) => {
   const pages = await Page.findAll();
@@ -9,13 +9,9 @@ wikiRouter.get("/", async (req, res, next) => {
 });
 
 wikiRouter.post("/", async (req, res, next) => {
-  const title = req.body.title;
-  const content = req.body.content;
-  const author = req.body.author;
-  const email = req.body.email;
-
   try {
-    const page = await Page.create({ title, content });
+    const { title, content, status, author, email } = req.body;
+    const page = await Page.create({ title, content, status });
     const [user, wasCreated] = await User.findOrCreate({
       where: {
         name: author,
@@ -30,22 +26,49 @@ wikiRouter.post("/", async (req, res, next) => {
   }
 });
 
+wikiRouter.put("/:slug", async (req, res, next) => {
+  try {
+    const { title, content, status } = req.body;
+    const page = await Page.findOne({ where: { slug: req.params.slug } });
+    const slug = ""; // handled in hooks
+    const updatedPage = await page.update({ title, slug, content, status });
+    res.redirect(`/wiki/${updatedPage.slug}`);
+  } catch (error) {}
+});
+
 wikiRouter.get("/add", (req, res) => {
   res.send(addPage());
 });
 
+async function getPageAndAuthor(slug) {
+  const page = await Page.findOne({
+    where: { slug: slug },
+    // include: "author", // another way to get the author (Eager loading)
+  });
+
+  // using the recommended way here:
+  const author = page ? await page.getAuthor() : undefined;
+  return [page, author];
+}
+
 wikiRouter.get("/:slug", async (req, res, next) => {
   try {
-    const page = await Page.findOne({
-      where: { slug: req.params.slug },
-      // include: "author", // another way to get the author (Eager loading)
-    });
-
-    // using the recommended way here:
-    const author = await page.getAuthor();
-    res.send(wikiPage(page, author.name));
+    const [page, author] = await getPageAndAuthor(req.params.slug);
+    if (!page) res.status(404).send("Page Not Found");
+    res.send(wikiPage(page, author));
   } catch (error) {
     next(error);
   }
 });
+
+wikiRouter.get("/:slug/edit", async (req, res, next) => {
+  try {
+    const [page, author] = await getPageAndAuthor(req.params.slug);
+    if (!page) res.status(404).send("Page Not Found");
+    res.send(editPage(page, author));
+  } catch (error) {
+    next(error);
+  }
+});
+
 module.exports = wikiRouter;

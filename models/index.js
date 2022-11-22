@@ -1,4 +1,4 @@
-const Sequelize = require("sequelize", {logging: false});
+const Sequelize = require("sequelize", { logging: false });
 const db = new Sequelize("postgres://localhost:5432/wikistack");
 
 const Page = db.define("pages", {
@@ -9,7 +9,10 @@ const Page = db.define("pages", {
 });
 
 Page.beforeValidate(async (page) => {
-  console.log(page);
+  page.slug = await generateSlug(page.title);
+});
+
+Page.afterUpdate(async (page) => {
   page.slug = await generateSlug(page.title);
 });
 
@@ -24,11 +27,12 @@ const User = db.define("users", {
   email: {
     type: Sequelize.STRING,
     allowNull: false,
-    validate: { isEmail: true }
+    validate: { isEmail: true },
   },
 });
 
 Page.belongsTo(User, { as: "author" });
+User.hasMany(Page, { foreignKey: "authorId" });
 
 module.exports = {
   db,
